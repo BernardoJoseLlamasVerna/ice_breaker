@@ -7,24 +7,29 @@ from tools.tools import get_profile_url
 def lookup(name: str) -> str:
     llm = AzureChatOpenAI(temperature=0, model_name='gpt-35-turbo-16k', deployment_name='gpt-35-turbo-16k')
     template = """given the full name {name_of_person} I want you to get it to return a link to their Linkedin profile page. 
-                Your answer should only contain a URL
+                Your answer should only contain a URL.
+                If there are several people with the same full name, choose first.
     """
     
     tools_for_agent = [
         Tool(
-            name='Crawl Google for linkedin profile page',
+            name='Crawl Google 1 linkedin profile page',
             func=get_profile_url,
             description='useful when you need to get the Linkedin Page URL'
         )
     ]
     
-    agent = initialize_agent(tools=tools_for_agent, 
-                             llm=llm,
-                             agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, 
-                             verbose=True)
+    agent = initialize_agent(
+        tools=tools_for_agent, 
+        llm=llm,
+        agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, 
+        verbose=True
+    )
+    
     prompt_template = PromptTemplate(
         template=template, input_variables=['name_of_person']
     )
+    
     linkedin_profile_url = agent.run(prompt_template.format_prompt(name_of_person=name))
     
     return linkedin_profile_url

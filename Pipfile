@@ -7,6 +7,8 @@ name = "pypi"
 langchain = "*"
 requests = "*"
 openai = "==0.28.1"
+flask = "*"
+python-dotenv = "*"
 
 [dev-packages]
 
